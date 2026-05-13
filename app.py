@@ -95,7 +95,17 @@ def grafico():
     nomes = [d[0] for d in dados]
     valores = [d[1] for d in dados]
 
-    plt.bar(nomes, valores)
+    plt.style.use("ggplot")
+
+cores = ["#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"]
+
+plt.bar(
+    nomes,
+    valores,
+    color=cores,
+    edgecolor="black",
+    linewidth=2
+
     plt.title("Estudantes por Nacionalidade")
     plt.xlabel("Nacionalidade")
     plt.ylabel("Quantidade")
@@ -157,8 +167,18 @@ def abrir_cadastro():
     combo_acolhimento.grid(row=3, column=1)
 
     # Botões
-    tk.Button(frame_form, text="Salvar", bg="#4CAF50", fg="white", command=salvar)\
-        .grid(row=4, column=0, pady=5)
+    tk.Button(
+    janela,
+    text="📊\nExcel",
+    command=excel,
+    bg="#10B981",
+    fg="white",
+    font=("Arial", 14, "bold"),
+    width=14,
+    height=4,
+    activebackground="#047857",
+    activeforeground="white"
+)
 
     tk.Button(frame_form, text="Excluir", bg="#f44336", fg="white", command=excluir)\
         .grid(row=4, column=1)
