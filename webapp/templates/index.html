@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bitita Web</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Bitita Web</h1>
+    </header>
+
+    <main class="container">
+      <section class="panel" aria-labelledby="form-title">
+        <h2 id="form-title">Cadastro de estudantes</h2>
+        <form id="student-form" aria-label="Cadastro de estudantes">
+          <div class="field-grid">
+            <div class="field">
+              <label for="name">Nome</label>
+              <input id="name" name="name" type="text" required />
+            </div>
+            <div class="field">
+              <label for="nationality">Nacionalidade</label>
+              <input id="nationality" name="nationality" type="text" required />
+            </div>
+            <div class="field">
+              <label for="generation">Geração</label>
+              <select id="generation" name="generation" required>
+                <option value="">Selecione</option>
+                <option value="1ª geração">1ª geração</option>
+                <option value="2ª geração">2ª geração</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="accommodation">Acolhimento</label>
+              <select id="accommodation" name="accommodation" required>
+                <option value="">Selecione</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="primary">Salvar</button>
+            <button type="button" id="reset-button" class="secondary">Limpar</button>
+          </div>
+        </form>
+        <p id="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="table-title">
+        <div class="section-header">
+          <h2 id="table-title">Estudantes cadastrados</h2>
+          <div class="search-box">
+            <label for="search-input" class="sr-only">Buscar estudante</label>
+            <input id="search-input" type="search" placeholder="Buscar por nome" aria-label="Buscar estudante" />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Nacionalidade</th>
+                <th>Geração</th>
+                <th>Acolhimento</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="student-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="dashboard-title">
+        <h2 id="dashboard-title">Dashboard por nacionalidade</h2>
+        <div id="dashboard" class="dashboard"></div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
