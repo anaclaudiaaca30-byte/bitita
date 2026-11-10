@@ -39,11 +39,22 @@ def delete_student(db: Session, student_id: int):
     return True
 
 
+
 def get_dashboard(db: Session):
-    data = (
-        db.query(Student.nationality, func.count(Student.id))
-        .group_by(Student.nationality)
+    nacionalidade = func.lower(func.trim(Student.nationality))
+
+    dados = (
+        db.query(nacionalidade, func.count(Student.id))
+        .group_by(nacionalidade)
         .order_by(func.count(Student.id).desc())
         .all()
     )
-    return [{"label": label, "value": value} for label, value in data]
+
+    return [
+        {
+            "label": label.title() if label else "Não informada",
+            "value": value
+        }
+        for label, value in dados
+    ]
+
