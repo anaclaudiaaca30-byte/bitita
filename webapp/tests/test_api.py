@@ -5,6 +5,17 @@ from webapp.app.main import app
 client = TestClient(app)
 
 
+def test_homepage_exposes_accessible_controls_and_table():
+    response = client.get('/')
+
+    assert response.status_code == 200
+    assert 'lang="pt-BR"' in response.text
+    assert 'Pular para o conteúdo principal' in response.text
+    assert 'role="status"' in response.text
+    assert '<caption class="sr-only">' in response.text
+    assert '<th scope="col">' in response.text
+
+
 def test_list_students():
     response = client.get('/api/students')
     assert response.status_code == 200
