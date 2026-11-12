@@ -20,6 +20,7 @@ Disponibilizar uma aplicação web que permita cadastrar, consultar, editar e ex
 | Templates | Jinja2 |
 | Persistência e ORM | SQLAlchemy |
 | Banco local | SQLite (`estudantes.db`) |
+| Dados de demonstração | SQLite (`webapp/demo_estudantes.db`), com registros fictícios |
 | Banco em nuvem preparado | PostgreSQL no Render (`bitita-db`) |
 | Validação de dados | Pydantic |
 | Testes | pytest e FastAPI TestClient |
@@ -74,6 +75,8 @@ O banco PostgreSQL `bitita-db` foi criado no Render. O código da aplicação ac
 **Estado da publicação:** o banco de dados está criado, mas a aplicação web ainda precisa ser publicada como um serviço Web Service separado no Render e configurada com a Internal Database URL. A URL do banco e outras credenciais não fazem parte deste relatório.
 
 Os registros existentes no SQLite não são copiados automaticamente para o banco PostgreSQL. Caso seja necessário manter os dados atuais, será preciso planejar e executar uma migração.
+
+Para compartilhamento seguro no GitHub, o repositório inclui uma base de demonstração separada, preenchida apenas com registros fictícios. Ela não é uma cópia dos dados pessoais da base local.
 
 Após a publicação do site no Render, a plataforma fornece HTTPS para a URL pública. A configuração de produção e a verificação do endereço HTTPS ficam pendentes até o deploy do serviço web.
 

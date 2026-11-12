@@ -34,6 +34,18 @@ Não publique nem compartilhe a URL do banco ou o arquivo `.env`: ambos dão ace
 
 Os registros que já existem em `estudantes.db` não são copiados automaticamente para o Render. Faça uma importação dos dados antes de usar a base na nuvem se precisar manter os cadastros existentes.
 
+## Banco de demonstração
+
+O arquivo `demo_estudantes.db` contém somente registros fictícios, criado para demonstrações e para compartilhar o projeto sem publicar dados pessoais. Para iniciar a aplicação web com essa base no Windows:
+
+```powershell
+cd webapp
+$env:DATABASE_URL = "sqlite:///./demo_estudantes.db"
+uvicorn app.main:app --reload
+```
+
+O comando seleciona o banco apenas para essa sessão do terminal; a configuração padrão continua usando `estudantes.db`.
+
 ## Publicar a aplicação web no Render
 
 O banco PostgreSQL e o site são serviços separados no Render. Para publicar o site:
