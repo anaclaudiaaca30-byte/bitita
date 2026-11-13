@@ -5,34 +5,68 @@ from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
-from .crud import create_student, delete_student, get_dashboard, get_students, update_student
+from .crud import (
+    create_student,
+    delete_student,
+    get_dashboard,
+    get_students,
+    update_student,
+)
 from .database import Base, engine, get_db
-from .schemas import DashboardItem, StudentCreate, StudentRead, StudentUpdate
+from .schemas import (
+    DashboardItem,
+    StudentCreate,
+    StudentRead,
+    StudentUpdate,
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-Base.metadata.create_all(bind=engine)
+
+def initialize_database():
+    Base.metadata.create_all(bind=engine)
+
+    with engine.begin() as connection:
+        columns = {
+            column["name"]
+            for column in inspect(connection).get_columns("estudantes")
+        }
+
+        if "acolhimento_institucional" not in columns:
+            connection.execute(
+                text(
+                    "ALTER TABLE estudantes "
+                    "ADD COLUMN acolhimento_institucional VARCHAR(20) "
+                    "NOT NULL DEFAULT 'Não informado'"
+                )
+            )
+
+
+initialize_database()
 
 app = FastAPI(
     title="Bitita Web",
     description="Sistema escolar com API, banco de dados e dashboard.",
-    version="1.0.0",
+    version="1.1.0",
 )
 
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app.mount(
+    "/static",
+    StaticFiles(directory=str(BASE_DIR / "static")),
+    name="static",
+)
+
+templates = Jinja2Templates(
+    directory=str(BASE_DIR / "templates")
+)
 
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(request, "index.html")
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
 
 
 @app.get("/health")
@@ -45,27 +79,59 @@ def list_students(db: Session = Depends(get_db)):
     return get_students(db)
 
 
-@app.post("/api/students", response_model=StudentRead, status_code=status.HTTP_201_CREATED)
-def create_student_route(student: StudentCreate, db: Session = Depends(get_db)):
+@app.post(
+    "/api/students",
+    response_model=StudentRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_student_route(
+    student: StudentCreate,
+    db: Session = Depends(get_db),
+):
     return create_student(db, student)
 
 
-@app.put("/api/students/{student_id}", response_model=StudentRead)
-def update_student_route(student_id: int, student: StudentUpdate, db: Session = Depends(get_db)):
+@app.put(
+    "/api/students/{student_id}",
+    response_model=StudentRead,
+)
+def update_student_route(
+    student_id: int,
+    student: StudentUpdate,
+    db: Session = Depends(get_db),
+):
     updated = update_student(db, student_id, student)
+
     if updated is None:
-        raise HTTPException(status_code=404, detail="Estudante não encontrado")
+        raise HTTPException(
+            status_code=404,
+            detail="Estudante não encontrado",
+        )
+
     return updated
 
 
-@app.delete("/api/students/{student_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_student_route(student_id: int, db: Session = Depends(get_db)):
+@app.delete(
+    "/api/students/{student_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_student_route(
+    student_id: int,
+    db: Session = Depends(get_db),
+):
     deleted = delete_student(db, student_id)
+
     if not deleted:
-        raise HTTPException(status_code=404, detail="Estudante não encontrado")
+        raise HTTPException(
+            status_code=404,
+            detail="Estudante não encontrado",
+        )
 
 
-@app.get("/api/dashboard", response_model=list[DashboardItem])
+@app.get(
+    "/api/dashboard",
+    response_model=list[DashboardItem],
+)
 def dashboard(db: Session = Depends(get_db)):
     return get_dashboard(db)
 
@@ -74,4 +140,10 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.getenv("PORT", "8000"))
-    uvicorn.run("webapp.app.main:app", host="0.0.0.0", port=port, reload=False)
+
+    uvicorn.run(
+        "webapp.app.main:app",
+        host="0.0.0.0",
+        port=port,
+        reload=False,
+    )

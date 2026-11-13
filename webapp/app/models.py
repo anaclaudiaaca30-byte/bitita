@@ -11,3 +11,11 @@ class Student(Base):
     nationality = Column("nacionalidade", String, nullable=False)
     generation = Column("geracao", String, nullable=False)
     accommodation = Column("acolhimento", String, nullable=False)
+
+    institutional_accommodation = Column(
+        "acolhimento_institucional",
+        String(20),
+        nullable=False,
+        default="Não informado",
+        server_default="Não informado",
+    )

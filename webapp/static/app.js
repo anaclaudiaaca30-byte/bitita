@@ -9,6 +9,9 @@ const errorMessage = document.getElementById('error-message');
 const resetButton = document.getElementById('reset-button');
 const searchInput = document.getElementById('search-input');
 const nameInput = document.getElementById('name');
+const institutionalAccommodationInput = document.getElementById(
+  'institutional_accommodation'
+);
 
 let allStudents = [];
 let editingId = null;
@@ -25,9 +28,11 @@ function announceError(text) {
 
 async function getErrorMessage(response) {
   const error = await response.json().catch(() => ({}));
+
   if (Array.isArray(error.detail)) {
     return error.detail.map((item) => item.msg).join('. ');
   }
+
   return error.detail || 'Ocorreu um erro. Tente novamente.';
 }
 
@@ -38,19 +43,38 @@ function addCell(row, value) {
   return cell;
 }
 
-async function fetchStudents() {
-  table.setAttribute('aria-busy', 'true');
-  tableMessage.textContent = 'Carregando estudantes...';
-  try {
-    const response = await fetch('/api/students');
-    if (!response.ok) {
-      throw new Error(await getErrorMessage(response));
-    }
-    allStudents = await response.json();
-    renderStudents(allStudents);
+function applySearch() {
+  const term = searchInput.value.trim().toLocaleLowerCase('pt-BR');
+
+  const filteredStudents = allStudents.filter((student) =>
+    student.name.toLocaleLowerCase('pt-BR').includes(term)
+  );
+
+  renderStudents(filteredStudents);
+
+  if (term) {
+    tableMessage.textContent =
+      `${filteredStudents.length} estudante(s) encontrado(s).`;
+  } else {
     tableMessage.textContent = allStudents.length
       ? `${allStudents.length} estudante(s) carregado(s).`
       : 'Nenhum estudante cadastrado.';
+  }
+}
+
+async function fetchStudents() {
+  table.setAttribute('aria-busy', 'true');
+  tableMessage.textContent = 'Carregando estudantes...';
+
+  try {
+    const response = await fetch('/api/students');
+
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response));
+    }
+
+    allStudents = await response.json();
+    applySearch();
     return true;
   } catch (error) {
     allStudents = [];
@@ -66,15 +90,29 @@ async function fetchStudents() {
 async function fetchDashboard() {
   dashboard.setAttribute('aria-busy', 'true');
   dashboard.textContent = 'Carregando resumo...';
+  dashboardTableBody.replaceChildren();
+
+  const loadingRow = document.createElement('tr');
+  addCell(loadingRow, 'Carregando resumo...').colSpan = 2;
+  dashboardTableBody.appendChild(loadingRow);
+
   try {
     const response = await fetch('/api/dashboard');
+
     if (!response.ok) {
       throw new Error(await getErrorMessage(response));
     }
+
     renderDashboard(await response.json());
     return true;
   } catch (error) {
     dashboard.textContent = 'Não foi possível carregar o resumo.';
+    dashboardTableBody.replaceChildren();
+
+    const row = document.createElement('tr');
+    addCell(row, 'Não foi possível carregar o resumo.').colSpan = 2;
+    dashboardTableBody.appendChild(row);
+
     announceError(`Erro ao carregar o dashboard: ${error.message}`);
     return false;
   } finally {
@@ -87,28 +125,36 @@ function renderStudents(students) {
 
   if (!students.length) {
     const row = document.createElement('tr');
-    const cell = addCell(row, 'Nenhum estudante encontrado.');
-    cell.colSpan = 6;
+    addCell(row, 'Nenhum estudante encontrado.').colSpan = 7;
     tableBody.appendChild(row);
     return;
   }
 
   students.forEach((student) => {
     const row = document.createElement('tr');
+
     addCell(row, String(student.id));
     addCell(row, student.name);
     addCell(row, student.nationality);
     addCell(row, student.generation);
     addCell(row, student.accommodation);
+    addCell(
+      row,
+      student.institutional_accommodation || 'Não informado'
+    );
 
     const actions = addCell(row, '');
+
     const editButton = document.createElement('button');
     editButton.type = 'button';
     editButton.className = 'edit-btn';
     editButton.dataset.action = 'edit';
     editButton.dataset.id = student.id;
     editButton.textContent = 'Editar';
-    editButton.setAttribute('aria-label', `Editar estudante ${student.name}`);
+    editButton.setAttribute(
+      'aria-label',
+      `Editar estudante ${student.name}`
+    );
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
@@ -116,7 +162,10 @@ function renderStudents(students) {
     deleteButton.dataset.action = 'delete';
     deleteButton.dataset.id = student.id;
     deleteButton.textContent = 'Excluir';
-    deleteButton.setAttribute('aria-label', `Excluir estudante ${student.name}`);
+    deleteButton.setAttribute(
+      'aria-label',
+      `Excluir estudante ${student.name}`
+    );
 
     actions.append(editButton, deleteButton);
     tableBody.appendChild(row);
@@ -124,12 +173,18 @@ function renderStudents(students) {
 }
 
 function renderDashboard(items) {
-  dashboard.innerHTML = '';
-  dashboardTableBody.innerHTML = '';
+  dashboard.replaceChildren();
+  dashboardTableBody.replaceChildren();
 
   if (!items.length) {
-    dashboard.innerHTML = '<p class="empty-state">Nenhum dado disponível.</p>';
-    dashboardTableBody.innerHTML = '<tr><td colspan="2">Nenhum dado disponível.</td></tr>';
+    const emptyMessage = document.createElement('p');
+    emptyMessage.className = 'empty-state';
+    emptyMessage.textContent = 'Nenhum dado disponível.';
+    dashboard.appendChild(emptyMessage);
+
+    const row = document.createElement('tr');
+    addCell(row, 'Nenhum dado disponível.').colSpan = 2;
+    dashboardTableBody.appendChild(row);
     return;
   }
 
@@ -139,6 +194,7 @@ function renderDashboard(items) {
 
     const label = document.createElement('span');
     label.textContent = item.label;
+
     const value = document.createElement('strong');
     value.textContent = String(item.value);
 
@@ -146,16 +202,15 @@ function renderDashboard(items) {
     dashboard.appendChild(card);
 
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${item.label}</td>
-      <td>${item.value}</td>
-    `;
+    addCell(row, item.label);
+    addCell(row, String(item.value));
     dashboardTableBody.appendChild(row);
   });
 }
 
 function prepareEdit(id) {
   const student = allStudents.find((item) => item.id === id);
+
   if (!student) return;
 
   editingId = id;
@@ -164,23 +219,43 @@ function prepareEdit(id) {
   document.getElementById('generation').value = student.generation;
   document.getElementById('accommodation').value = student.accommodation;
 
+  institutionalAccommodationInput.value =
+    student.institutional_accommodation || 'Não informado';
+
   form.querySelector('button[type="submit"]').textContent = 'Atualizar';
   announceSuccess(`Editando estudante ${student.name}.`);
   nameInput.focus();
 }
 
+function resetFormState() {
+  editingId = null;
+  form.reset();
+  institutionalAccommodationInput.value = 'Não informado';
+  form.querySelector('button[type="submit"]').textContent = 'Salvar';
+}
+
 async function deleteStudent(id, button) {
   const student = allStudents.find((item) => item.id === id);
+
   if (!student) return;
 
-  if (!window.confirm(`Deseja excluir o estudante ${student.name}? Esta ação não pode ser desfeita.`)) {
+  const confirmed = window.confirm(
+    `Deseja excluir o estudante ${student.name}? ` +
+    'Esta ação não pode ser desfeita.'
+  );
+
+  if (!confirmed) {
     button.focus();
     return;
   }
 
   button.disabled = true;
+
   try {
-    const response = await fetch(`/api/students/${id}`, { method: 'DELETE' });
+    const response = await fetch(`/api/students/${id}`, {
+      method: 'DELETE',
+    });
+
     if (!response.ok) {
       throw new Error(await getErrorMessage(response));
     }
@@ -188,15 +263,23 @@ async function deleteStudent(id, button) {
     if (editingId === id) {
       resetFormState();
     }
+
     const [studentsLoaded, dashboardLoaded] = await Promise.all([
       fetchStudents(),
       fetchDashboard(),
     ]);
+
     if (studentsLoaded && dashboardLoaded) {
-      announceSuccess(`Estudante ${student.name} excluído com sucesso.`);
+      announceSuccess(
+        `Estudante ${student.name} excluído com sucesso.`
+      );
     } else {
-      announceError(`Estudante ${student.name} excluído, mas não foi possível atualizar todos os dados exibidos.`);
+      announceError(
+        `Estudante ${student.name} excluído, mas não foi possível ` +
+        'atualizar todos os dados exibidos.'
+      );
     }
+
     document.getElementById('table-title').focus();
   } catch (error) {
     button.disabled = false;
@@ -204,17 +287,13 @@ async function deleteStudent(id, button) {
   }
 }
 
-function resetFormState() {
-  editingId = null;
-  form.reset();
-  form.querySelector('button[type="submit"]').textContent = 'Salvar';
-}
-
 tableBody.addEventListener('click', async (event) => {
   const button = event.target.closest('button[data-action]');
+
   if (!button) return;
 
   const id = Number(button.dataset.id);
+
   if (button.dataset.action === 'delete') {
     await deleteStudent(id, button);
   } else if (button.dataset.action === 'edit') {
@@ -225,16 +304,27 @@ tableBody.addEventListener('click', async (event) => {
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
+  if (!form.reportValidity()) return;
+
   const submitButton = form.querySelector('button[type="submit"]');
   const wasEditing = editingId !== null;
   const payload = Object.fromEntries(new FormData(form).entries());
-  const url = wasEditing ? `/api/students/${editingId}` : '/api/students';
+
+  payload.institutional_accommodation =
+    institutionalAccommodationInput.value || 'Não informado';
+
+  const url = wasEditing
+    ? `/api/students/${editingId}`
+    : '/api/students';
 
   submitButton.disabled = true;
+
   try {
     const response = await fetch(url, {
       method: wasEditing ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(payload),
     });
 
@@ -243,17 +333,25 @@ form.addEventListener('submit', async (event) => {
     }
 
     resetFormState();
+
     const [studentsLoaded, dashboardLoaded] = await Promise.all([
       fetchStudents(),
       fetchDashboard(),
     ]);
+
     if (studentsLoaded && dashboardLoaded) {
       announceSuccess(
-        wasEditing ? 'Estudante atualizado com sucesso.' : 'Estudante cadastrado com sucesso.'
+        wasEditing
+          ? 'Estudante atualizado com sucesso.'
+          : 'Estudante cadastrado com sucesso.'
       );
     } else {
-      announceError('Dados salvos, mas não foi possível atualizar todas as informações exibidas.');
+      announceError(
+        'Dados salvos, mas não foi possível atualizar ' +
+        'todas as informações exibidas.'
+      );
     }
+
     nameInput.focus();
   } catch (error) {
     announceError(`Erro ao salvar estudante: ${error.message}`);
@@ -265,16 +363,10 @@ form.addEventListener('submit', async (event) => {
 resetButton.addEventListener('click', () => {
   resetFormState();
   announceSuccess('Campos limpos.');
+  nameInput.focus();
 });
 
-searchInput.addEventListener('input', () => {
-  const term = searchInput.value.trim().toLocaleLowerCase();
-  const filteredStudents = allStudents.filter((student) =>
-    student.name.toLocaleLowerCase().includes(term)
-  );
-  renderStudents(filteredStudents);
-  tableMessage.textContent = `${filteredStudents.length} estudante(s) encontrado(s).`;
-});
+searchInput.addEventListener('input', applySearch);
 
 fetchStudents();
 fetchDashboard();
