@@ -126,6 +126,13 @@ select {
   background: white;
 }
 
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
 button {
   border: 0;
   border-radius: 8px;
@@ -212,6 +219,34 @@ th {
   display: block;
   font-size: 1.5rem;
   margin-top: 0.5rem;
+}
+
+.dashboard-table-wrap {
+  margin-top: 1.25rem;
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.dashboard-table th {
+  background: var(--panel-alt);
+}
+
+.empty-state {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 #message {

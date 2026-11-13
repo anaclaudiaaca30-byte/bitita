@@ -82,8 +82,23 @@
 
       <section class="panel" aria-labelledby="dashboard-title">
         <h2 id="dashboard-title">Dashboard por nacionalidade</h2>
-        <div id="dashboard" class="dashboard" role="status" aria-live="polite" aria-busy="true">
-          Carregando resumo...
+        <div id="dashboard" class="dashboard" aria-live="polite"></div>
+
+        <div class="dashboard-table-wrap">
+          <table class="dashboard-table" aria-label="Resumo por nacionalidade">
+            <caption class="sr-only">Resumo por nacionalidade</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nacionalidade</th>
+                <th scope="col">Total</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-table-body">
+              <tr>
+                <td colspan="2">Nenhum dado disponível.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </main>

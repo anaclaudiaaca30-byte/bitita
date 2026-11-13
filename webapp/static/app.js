@@ -3,6 +3,7 @@ const table = document.querySelector('.table-wrap table');
 const tableBody = document.getElementById('student-table-body');
 const tableMessage = document.getElementById('table-message');
 const dashboard = document.getElementById('dashboard');
+const dashboardTableBody = document.getElementById('dashboard-table-body');
 const message = document.getElementById('message');
 const errorMessage = document.getElementById('error-message');
 const resetButton = document.getElementById('reset-button');
@@ -123,10 +124,12 @@ function renderStudents(students) {
 }
 
 function renderDashboard(items) {
-  dashboard.replaceChildren();
+  dashboard.innerHTML = '';
+  dashboardTableBody.innerHTML = '';
 
   if (!items.length) {
-    dashboard.textContent = 'Nenhum estudante para resumir.';
+    dashboard.innerHTML = '<p class="empty-state">Nenhum dado disponível.</p>';
+    dashboardTableBody.innerHTML = '<tr><td colspan="2">Nenhum dado disponível.</td></tr>';
     return;
   }
 
@@ -141,6 +144,13 @@ function renderDashboard(items) {
 
     card.append(label, value);
     dashboard.appendChild(card);
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${item.label}</td>
+      <td>${item.value}</td>
+    `;
+    dashboardTableBody.appendChild(row);
   });
 }
 
