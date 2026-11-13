@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bitita-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./webapp/Dockerfile
+    dockerContext: ./webapp
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: "8000"

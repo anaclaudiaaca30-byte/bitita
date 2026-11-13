@@ -28,6 +28,11 @@ async def index(request: Request):
     return templates.TemplateResponse(request, "index.html")
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.get("/api/students", response_model=list[StudentRead])
 def list_students(db: Session = Depends(get_db)):
     return get_students(db)
