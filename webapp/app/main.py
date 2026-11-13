@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
@@ -17,6 +18,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Bitita Web",
     description="Sistema escolar com API, banco de dados e dashboard.",
+    version="1.0.0",
 )
 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
@@ -26,6 +28,11 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/health")
+def healthcheck():
+    return {"status": "ok", "service": "bitita-web"}
 
 
 @app.get("/api/students", response_model=list[StudentRead])
@@ -56,3 +63,10 @@ def delete_student_route(student_id: int, db: Session = Depends(get_db)):
 @app.get("/api/dashboard", response_model=list[DashboardItem])
 def dashboard(db: Session = Depends(get_db)):
     return get_dashboard(db)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run("webapp.app.main:app", host="0.0.0.0", port=port, reload=False)

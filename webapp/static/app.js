@@ -1,6 +1,7 @@
 const form = document.getElementById('student-form');
 const tableBody = document.getElementById('student-table-body');
 const dashboard = document.getElementById('dashboard');
+const dashboardTableBody = document.getElementById('dashboard-table-body');
 const message = document.getElementById('message');
 const resetButton = document.getElementById('reset-button');
 const searchInput = document.getElementById('search-input');
@@ -62,6 +63,13 @@ function renderStudents(students) {
 
 function renderDashboard(items) {
   dashboard.innerHTML = '';
+  dashboardTableBody.innerHTML = '';
+
+  if (!items.length) {
+    dashboard.innerHTML = '<p class="empty-state">Nenhum dado disponível.</p>';
+    dashboardTableBody.innerHTML = '<tr><td colspan="2">Nenhum dado disponível.</td></tr>';
+    return;
+  }
 
   items.forEach((item) => {
     const card = document.createElement('div');
@@ -71,6 +79,13 @@ function renderDashboard(items) {
       <strong>${item.value}</strong>
     `;
     dashboard.appendChild(card);
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${item.label}</td>
+      <td>${item.value}</td>
+    `;
+    dashboardTableBody.appendChild(row);
   });
 }
 
