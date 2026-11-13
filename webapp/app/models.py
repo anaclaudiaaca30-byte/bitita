@@ -4,10 +4,10 @@ from .database import Base
 
 
 class Student(Base):
-    __tablename__ = "students"
+    __tablename__ = "estudantes"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    nationality = Column(String, nullable=False)
-    generation = Column(String, nullable=False)
-    accommodation = Column(String, nullable=False)
+    name = Column("nome", String, nullable=False)
+    nationality = Column("nacionalidade", String, nullable=False)
+    generation = Column("geracao", String, nullable=False)
+    accommodation = Column("acolhimento", String, nullable=False)
