@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -6,6 +8,10 @@ class StudentBase(BaseModel):
     nationality: str = Field(..., min_length=1, max_length=120)
     generation: str = Field(..., min_length=1, max_length=50)
     accommodation: str = Field(..., min_length=1, max_length=50)
+
+    institutional_accommodation: Literal[
+        "Sim", "Não", "Não informado"
+    ] = "Não informado"
 
 
 class StudentCreate(StudentBase):
@@ -18,6 +24,7 @@ class StudentUpdate(StudentBase):
 
 class StudentRead(StudentBase):
     id: int
+
     model_config = ConfigDict(from_attributes=True)
 
 

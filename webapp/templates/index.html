@@ -6,8 +6,12 @@
     <title>Bitita Web</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
+
   <body>
-    <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
+    <a class="skip-link" href="#main-content">
+      Pular para o conteúdo principal
+    </a>
+
     <header class="topbar">
       <h1>Bitita Web</h1>
     </header>
@@ -15,16 +19,31 @@
     <main id="main-content" class="container" tabindex="-1">
       <section class="panel" aria-labelledby="form-title">
         <h2 id="form-title">Cadastro de estudantes</h2>
+
         <form id="student-form" aria-label="Cadastro de estudantes">
           <div class="field-grid">
             <div class="field">
               <label for="name">Nome</label>
-              <input id="name" name="name" type="text" required />
+              <input
+                id="name"
+                name="name"
+                type="text"
+                maxlength="150"
+                required
+              />
             </div>
+
             <div class="field">
               <label for="nationality">Nacionalidade</label>
-              <input id="nationality" name="nationality" type="text" required />
+              <input
+                id="nationality"
+                name="nationality"
+                type="text"
+                maxlength="120"
+                required
+              />
             </div>
+
             <div class="field">
               <label for="generation">Geração</label>
               <select id="generation" name="generation" required>
@@ -33,6 +52,7 @@
                 <option value="2ª geração">2ª geração</option>
               </select>
             </div>
+
             <div class="field">
               <label for="accommodation">Acolhimento</label>
               <select id="accommodation" name="accommodation" required>
@@ -41,28 +61,83 @@
                 <option value="Não">Não</option>
               </select>
             </div>
+
+            <div class="field">
+              <label for="institutional_accommodation">
+                Acolhimento institucional
+              </label>
+              <select
+                id="institutional_accommodation"
+                name="institutional_accommodation"
+                aria-describedby="institutional-accommodation-help"
+              >
+                <option value="Não informado">Não informado</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+              <p id="institutional-accommodation-help">
+                Indica se o estudante está em serviço de acolhimento
+                institucional. Se não houver confirmação, mantenha
+                “Não informado”.
+              </p>
+            </div>
           </div>
+
           <div class="actions">
             <button type="submit" class="primary">Salvar</button>
-            <button type="button" id="reset-button" class="secondary">Limpar</button>
+            <button type="button" id="reset-button" class="secondary">
+              Limpar
+            </button>
           </div>
         </form>
-        <p id="message" role="status" aria-live="polite" aria-atomic="true"></p>
+
+        <p
+          id="message"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        ></p>
         <p id="error-message" role="alert" aria-atomic="true"></p>
       </section>
 
       <section class="panel" aria-labelledby="table-title">
         <div class="section-header">
-          <h2 id="table-title" tabindex="-1">Estudantes cadastrados</h2>
+          <h2 id="table-title" tabindex="-1">
+            Estudantes cadastrados
+          </h2>
+
           <div class="search-box">
-            <label for="search-input" class="sr-only">Buscar estudante</label>
-            <input id="search-input" type="search" placeholder="Buscar por nome" aria-label="Buscar estudante" />
+            <label for="search-input" class="sr-only">
+              Buscar estudante
+            </label>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="Buscar por nome"
+              aria-label="Buscar estudante"
+            />
           </div>
         </div>
-        <p id="table-message" role="status" aria-live="polite" aria-atomic="true">Carregando estudantes...</p>
-        <div class="table-wrap" role="region" aria-label="Tabela de estudantes cadastrados" tabindex="0">
+
+        <p
+          id="table-message"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          Carregando estudantes...
+        </p>
+
+        <div
+          class="table-wrap"
+          role="region"
+          aria-label="Tabela de estudantes cadastrados"
+          tabindex="0"
+        >
           <table aria-busy="true">
-            <caption class="sr-only">Estudantes cadastrados e ações disponíveis para cada estudante</caption>
+            <caption class="sr-only">
+              Estudantes cadastrados e ações disponíveis para cada estudante
+            </caption>
             <thead>
               <tr>
                 <th scope="col">ID</th>
@@ -70,11 +145,14 @@
                 <th scope="col">Nacionalidade</th>
                 <th scope="col">Geração</th>
                 <th scope="col">Acolhimento</th>
+                <th scope="col">Acolhimento institucional</th>
                 <th scope="col">Ações</th>
               </tr>
             </thead>
             <tbody id="student-table-body">
-              <tr><td colspan="6">Carregando estudantes...</td></tr>
+              <tr>
+                <td colspan="7">Carregando estudantes...</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -82,11 +160,21 @@
 
       <section class="panel" aria-labelledby="dashboard-title">
         <h2 id="dashboard-title">Dashboard por nacionalidade</h2>
-        <div id="dashboard" class="dashboard" aria-live="polite"></div>
+
+        <div
+          id="dashboard"
+          class="dashboard"
+          aria-live="polite"
+        ></div>
 
         <div class="dashboard-table-wrap">
-          <table class="dashboard-table" aria-label="Resumo por nacionalidade">
-            <caption class="sr-only">Resumo por nacionalidade</caption>
+          <table
+            class="dashboard-table"
+            aria-label="Resumo por nacionalidade"
+          >
+            <caption class="sr-only">
+              Resumo por nacionalidade
+            </caption>
             <thead>
               <tr>
                 <th scope="col">Nacionalidade</th>
